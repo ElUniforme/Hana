@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perdón</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
+            opacity: 0;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        #main-message {
+            position: absolute;
+            color: #ff00ff;
+            font-size: 8vw;
+            text-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff;
+            opacity: 1;
+            animation: pulse 4s infinite;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="matrix"></div>
+    <div id="main-message">¿ME PERDONAS? 😞</div>
+
+    <script>
+        const matrix = document.getElementById('matrix');
+        const message = document.getElementById('main-message');
+        const perdonaChars = "TE AMO MUCHO";
+        const columns = Math.floor(window.innerWidth / 20);
+        const drops = [];
+        
+        // Configuración inicial
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.floor(Math.random() * -100);
+        }
+        
+        // Crear columnas de caracteres
+        function drawMatrix() {
+            matrix.innerHTML = '';
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.style.position = 'absolute';
+                column.style.left = i * 20 + 'px';
+                column.style.top = '0';
+                column.style.width = '20px';
+                column.style.color = i % 2 === 0 ? '#cc00ff' : '#ff00cc';
+                column.style.fontSize = '20px';
+                column.style.fontWeight = 'bold';
+                column.style.textAlign = 'center';
+                column.style.opacity = '0.8';
+                column.style.zIndex = '1';
+                
+                let text = '';
+                const dropPos = drops[i];
+                
+                // Crear caracteres para la columna
+                for (let j = 0; j < 50; j++) {
+                    if (j === dropPos) {
+                        // Caracter especial en la posición de caída (alterna entre letras de "ME PERDONAS")
+                        const charIndex = Math.floor(j % perdonaChars.length);
+                        text += '<span style="color: #ffffff; text-shadow: 0 0 5px #ffffff">' + 
+                                perdonaChars.charAt(charIndex) + 
+                                '</span>';
+                    } else if (j < dropPos && j > dropPos - 10) {
+                        // Caracteres brillantes (letras de "ME PERDONAS")
+                        const charIndex = Math.floor(j % perdonaChars.length);
+                        text += '<span style="color: ' + (i % 2 === 0 ? '#cc00ff' : '#ff00cc') + '; text-shadow: 0 0 3px ' + (i % 2 === 0 ? '#cc00ff' : '#ff00cc') + '">' + 
+                                perdonaChars.charAt(charIndex) + '</span>';
+                    } else if (j < dropPos && j > dropPos - 20) {
+                        // Caracteres tenues (letras de "ME PERDONAS")
+                        const charIndex = Math.floor(j % perdonaChars.length);
+                        text += '<span style="color: ' + (i % 2 === 0 ? '#9900cc' : '#cc0099') + '">' + 
+                                perdonaChars.charAt(charIndex) + '</span>';
+                    } else {
+                        text += '<br>';
+                    }
+                }
+                
+                column.innerHTML = text;
+                matrix.appendChild(column);
+                
+                // Mover la posición de caída
+                drops[i]++;
+                if (drops[i] > 50 + Math.random() * 100) {
+                    drops[i] = 0;
+                }
+            }
+            
+            // Crear corazones flotantes
+            if (Math.random() > 0.7) {
+                createHeart();
+            }
+        }
+        
+        // Crear corazones que flotan
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '♥';
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.top = window.innerHeight + 'px';
+            heart.style.animationDuration = 3 + Math.random() * 3 + 's';
+            matrix.appendChild(heart);
+            
+            // Eliminar después de la animación
+            setTimeout(() => {
+                heart.remove();
+            }, 4000);
+        }
+        
+        // Animación continua
+        setInterval(drawMatrix, 50);
+        
+        // Ajustar al cambiar tamaño de ventana
+        window.addEventListener('resize', () => {
+            const newColumns = Math.floor(window.innerWidth / 20);
+            if (newColumns !== columns) {
+                window.location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
